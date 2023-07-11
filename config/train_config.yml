@@ -1,0 +1,27 @@
+# SimpleModel, mobilenet_v3_small, mobilenet_v3_large
+model_name: mobilenet_v3_small
+
+#Max epochs
+epochs: 20
+
+#Data path
+train_path: ./data/train.json
+val_path: ./data/val.json 
+# test_path: ./data/test.json
+
+#Folder to save weight
+weight_dir: ./weight/
+
+#for inference only:
+inference_weight: ./weight/mobilenet_v3_small_lastest_w224_h224.pth
+image_folder: /home/phung/AnhHung/temp/rotated_test/
+
+#Train image size
+fixed_w: 224
+fixed_h: 224
+
+batch_size: 64
+
+classes:
+  - "0"
+  - "180"

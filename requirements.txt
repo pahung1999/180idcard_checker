@@ -1,0 +1,8 @@
+torch
+torchvision
+torchvision
+tqdm
+Pillow
+pyyaml
+onnx
+onnxruntime
