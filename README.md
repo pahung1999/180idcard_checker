@@ -53,7 +53,7 @@ Install the required dependencies. It is recommended to set up a virtual environ
             "image_path": "./images/cccd_chip_back_0001.jpg",
             "label": "1"
         },
-        ...
+         (...)
     ]
     }
     ```
