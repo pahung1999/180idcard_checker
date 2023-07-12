@@ -10,6 +10,10 @@ from tqdm import tqdm
 import yaml
 import os
 from PIL import Image
+import albumentations as A
+
+
+
 MODEL_LIST = ["SimpleModel", "mobilenet_v3_small", "mobilenet_v3_large"]
 
 yaml_path = "./config/train_config.yml"
@@ -37,10 +41,17 @@ transform = transforms.Compose([
 # ])
 
 #Load data
-train_dataset = CustomDataset(config_gen['train_path'], num_classes = num_classes, transform=transform)
+print("Creating dataset...")
+train_dataset = CustomDataset(config_gen['train_path'], 
+                              num_classes = num_classes, 
+                              background_dir = config_gen['background_dir'], 
+                              transform=transform)
 train_loader = DataLoader(train_dataset, batch_size=config_gen['batch_size'], shuffle=True)
 
-val_dataset = CustomDataset(config_gen['val_path'], num_classes = num_classes, transform=transform)
+val_dataset = CustomDataset(config_gen['val_path'], 
+                            num_classes = num_classes, 
+                            background_dir = config_gen['background_dir'], 
+                            transform=transform)
 val_loader = DataLoader(val_dataset, batch_size=config_gen['batch_size'], shuffle=False)
 
 
@@ -61,7 +72,11 @@ else:
         model = mobilenet_v3_large(weights=MobileNet_V3_Large_Weights.IMAGENET1K_V1, progress = True)
         model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, num_classes)
 
-
+if config_gen["pre_trained"] is not None:
+    pretrained_path = config_gen["pre_trained"]
+    model.load_state_dict(torch.load(pretrained_path))
+    print(f"Loaded weight: {pretrained_path}")
+    print("-"*15)
 
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
@@ -73,6 +88,7 @@ best_acc = 0
 num_epochs = config_gen['epochs']
 # Create an example input tensor
 example_input = torch.randn(1, 3, fixed_h, fixed_w).to(device)
+print("Training process....")
 for epoch in range(num_epochs):
     print("Epoch: ",epoch+1)
     model.train()

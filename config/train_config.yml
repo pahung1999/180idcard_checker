@@ -11,6 +11,9 @@ val_path: ./data/1labels/val.json
 #Folder to save weight
 weight_dir: ./weight/4labels/
 
+#For load
+pre_trained: ./weight/4labels/mobilenet_v3_small_lastest_w224_h224.pth
+
 #for inference only:
 inference_weight: ./weight/4labels/mobilenet_v3_small_best_acc_w224_h224.pth
 image_folder: /home/phung/AnhHung/temp/rotated_test/
@@ -19,7 +22,11 @@ image_folder: /home/phung/AnhHung/temp/rotated_test/
 fixed_w: 224
 fixed_h: 224
 
-batch_size: 32
+batch_size: 64
+
+#For augment
+background_dir: /home/phung/AnhHung/data/segment/bg/
+
 
 #Should be sorted in ascending order
 classes: 
