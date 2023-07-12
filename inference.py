@@ -5,7 +5,7 @@ from torchvision import transforms
 from PIL import Image
 import torch
 from model.model import SimpleModel, load_model
-
+import random
 
 yaml_path = "./config/train_config.yml"
 with open(yaml_path, 'r') as file:
@@ -45,3 +45,33 @@ for filename in os.listdir(image_folder):
 
     print(f"{filename}")
     print(f'Predicted label: {predicted_label}')
+
+
+# test_num = 20
+# correct = 0
+# for i in range(test_num):
+#     filename = random.choice(os.listdir(image_folder))
+#     image_path = os.path.join(image_folder, filename)
+
+#     image = Image.open(image_path).convert("RGB")
+#     if "180" in filename:
+#         image = image.rotate(180, expand = True)
+    
+#     label = random.randint(0, 3)
+#     image = image.rotate(int(90*label), expand=True)
+    
+#     test_image = transform(image)
+#     test_image = test_image.unsqueeze(0)  # Add a batch dimension
+
+#     # Make predictions on the test image
+#     with torch.no_grad():
+#         outputs = model(test_image.to(device))
+#         _, predicted = torch.max(outputs, 1)
+        
+#     # Get the predicted label
+#     predicted_label = config_gen["classes"][predicted.item()]
+
+#     # print(f"{filename}")
+#     print(f"Groundtruth: {label*90}")
+#     print(f'Predicted label: {int(predicted.item())*90}')
+#     print("="*15)

@@ -18,6 +18,10 @@ with open(yaml_path, 'r') as file:
 
 fixed_w = config_gen['fixed_w']
 fixed_h = config_gen['fixed_h']
+num_classes = len(config_gen['classes'])
+
+if not os.path.exists(config_gen['weight_dir']):
+   os.makedirs(config_gen['weight_dir'])
 
 transform = transforms.Compose([
     transforms.Resize((fixed_h, fixed_w)),  # Resize the image to a fixed size
@@ -33,31 +37,29 @@ transform = transforms.Compose([
 # ])
 
 #Load data
-train_dataset = CustomDataset(config_gen['train_path'], transform=transform)
+train_dataset = CustomDataset(config_gen['train_path'], num_classes = num_classes, transform=transform)
 train_loader = DataLoader(train_dataset, batch_size=config_gen['batch_size'], shuffle=True)
 
-val_dataset = CustomDataset(config_gen['val_path'], transform=transform)
+val_dataset = CustomDataset(config_gen['val_path'], num_classes = num_classes, transform=transform)
 val_loader = DataLoader(val_dataset, batch_size=config_gen['batch_size'], shuffle=False)
 
-# val_dataset = CustomDataset(config_gen['test_path'], transform=transform)
-# val_loader = DataLoader(val_dataset, batch_size=config_gen['batch_size'], shuffle=False)
 
 #Load model
 if config_gen['model_name'] not in MODEL_LIST:
     raise ValueError(f"Can't find {config_gen['model_name']} in MODEL_LIST = {MODEL_LIST}")
 else:
     if config_gen['model_name'] == "SimpleModel":
-        model = SimpleModel(class_num = len(config_gen['classes']), w = fixed_w, h = fixed_h)
+        model = SimpleModel(class_num = num_classes, w = fixed_w, h = fixed_h)
 
     if config_gen['model_name'] == "mobilenet_v3_small":
         from torchvision.models import mobilenet_v3_small, MobileNet_V3_Small_Weights
         model = mobilenet_v3_small(weights=MobileNet_V3_Small_Weights.IMAGENET1K_V1, progress = True)
-        model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, len(train_dataset.classes))
+        model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, num_classes)
 
     if config_gen['model_name'] == "mobilenet_v3_large":
         from torchvision.models import mobilenet_v3_large, MobileNet_V3_Large_Weights
         model = mobilenet_v3_large(weights=MobileNet_V3_Large_Weights.IMAGENET1K_V1, progress = True)
-        model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, len(train_dataset.classes))
+        model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, num_classes)
 
 
 
