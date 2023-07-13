@@ -2,6 +2,19 @@ from typing import Any
 import torch.nn as nn
 
 class SimpleModel(nn.Module):
+    """
+    Simple convolutional neural network model. Shouldn't use this model
+
+    Args:
+        class_num (int): The number of output classes. Default is 2.
+        w (int): The width of the input image. Default is 1024.
+        h (int): The height of the input image. Default is 1024.
+
+    Attributes:
+        features (nn.Sequential): The sequential module for the convolutional feature extraction layers.
+        classifier (nn.Sequential): The sequential module for the classification layers.
+
+    """
     def __init__(self, class_num = 2, w = 1024, h = 1024):
         super(SimpleModel, self).__init__()
         self.features = nn.Sequential(
@@ -30,7 +43,21 @@ class SimpleModel(nn.Module):
 def load_model(model_name: str,
                num_classes: int =2,
                **kwargs: Any):
- 
+    """
+    Load a pre-defined model or custom model.
+
+    Args:
+        model_name (str): The name of the model to load.
+        num_classes (int): The number of output classes. Default is 2.
+        **kwargs (Any): Additional keyword arguments to pass to the model constructor.
+
+    Returns:
+        nn.Module: The loaded model.
+
+    Raises:
+        ValueError: If the specified model name is not supported.
+
+    """
     if model_name == "SimpleModel":
         model = SimpleModel(class_num = num_classes, **kwargs)
 

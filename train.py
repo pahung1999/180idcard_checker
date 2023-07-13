@@ -5,12 +5,12 @@ from torchvision import transforms
 from torch.utils.data import Dataset, DataLoader
 import json
 from model.data import CustomDataset
-from model.model import SimpleModel
 from tqdm import tqdm
 import yaml
 import os
 from PIL import Image
 import albumentations as A
+from model.model import load_model
 
 
 
@@ -22,7 +22,7 @@ with open(yaml_path, 'r') as file:
 
 fixed_w = config_gen['fixed_w']
 fixed_h = config_gen['fixed_h']
-num_classes = len(config_gen['classes'])
+num_classes = config_gen['num_classes']
 
 if not os.path.exists(config_gen['weight_dir']):
    os.makedirs(config_gen['weight_dir'])
@@ -33,12 +33,6 @@ transform = transforms.Compose([
     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])  # Normalize the image
 ])
 
-# transform = transforms.Compose([
-#     transforms.Resize(256),
-#     transforms.CenterCrop(224),
-#     transforms.ToTensor(),
-#     transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
-# ])
 
 #Load data
 print("Creating dataset...")
@@ -59,24 +53,18 @@ val_loader = DataLoader(val_dataset, batch_size=config_gen['batch_size'], shuffl
 if config_gen['model_name'] not in MODEL_LIST:
     raise ValueError(f"Can't find {config_gen['model_name']} in MODEL_LIST = {MODEL_LIST}")
 else:
-    if config_gen['model_name'] == "SimpleModel":
-        model = SimpleModel(class_num = num_classes, w = fixed_w, h = fixed_h)
-
-    if config_gen['model_name'] == "mobilenet_v3_small":
-        from torchvision.models import mobilenet_v3_small, MobileNet_V3_Small_Weights
-        model = mobilenet_v3_small(weights=MobileNet_V3_Small_Weights.IMAGENET1K_V1, progress = True)
-        model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, num_classes)
-
-    if config_gen['model_name'] == "mobilenet_v3_large":
-        from torchvision.models import mobilenet_v3_large, MobileNet_V3_Large_Weights
-        model = mobilenet_v3_large(weights=MobileNet_V3_Large_Weights.IMAGENET1K_V1, progress = True)
-        model.classifier[-1] = nn.Linear(model.classifier[-1].in_features, num_classes)
+    model = load_model(model_name = config_gen['model_name'],
+                   num_classes =  num_classes,
+                   w = config_gen['fixed_w'], 
+                   h = config_gen['fixed_h'])
+    
 
 if config_gen["pre_trained"] is not None:
     pretrained_path = config_gen["pre_trained"]
     model.load_state_dict(torch.load(pretrained_path))
     print(f"Loaded weight: {pretrained_path}")
     print("-"*15)
+
 
 criterion = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=0.0001)
@@ -140,7 +128,6 @@ for epoch in range(num_epochs):
     print(f"Saved last weight to: {weight_path}")
     print(f"Saved last weight to: {onnx_path}")
 
-    print(f"Best Accuracy: {best_acc}")
     if accuracy > best_acc:
         best_acc = accuracy
         weight_path = os.path.join(config_gen['weight_dir'], f"{config_gen['model_name']}_best_acc_w{fixed_w}_h{fixed_h}.pth")
@@ -152,3 +139,4 @@ for epoch in range(num_epochs):
 
         print(f"Saved best weight to: {weight_path}")
         print(f"Saved best weight to: {onnx_path}")
+    print(f"Best Accuracy: {best_acc}")

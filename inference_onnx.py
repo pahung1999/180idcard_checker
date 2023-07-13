@@ -43,7 +43,7 @@ image_folder = config_gen['image_folder']
 #     # Get the predicted label
 #     output = output[0]
 #     predicted_label_index = np.argmax(output)
-#     print(f"{filename}: {int(predicted_label_index)*360/len(config_gen['classes'])}" )
+#     print(f"{filename}: {int(predicted_label_index)*360/config_gen['num_classes']}" )
 
 
 
@@ -80,6 +80,6 @@ for i in range(test_num):
 
     # print(f"{filename}")
     print(f"Groundtruth: {label*90}")
-    print(f"{filename}: {int(predicted_label_index)*360/len(config_gen['classes'])}" )
+    print(f"{filename}: {int(predicted_label_index)*360/config_gen['num_classes']}" )
     print("="*15)
 print("Accuracy: ", correct/test_num)

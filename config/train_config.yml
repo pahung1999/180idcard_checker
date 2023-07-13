@@ -27,14 +27,6 @@ batch_size: 64
 #For augment
 background_dir: /home/phung/AnhHung/data/segment/bg/
 
+#rotate angle list: [int(360*i/num_classes) for i in range(num_classes)]
+num_classes: 4
 
-#Should be sorted in ascending order
-classes: 
-  - "0"
-  # - "45"
-  - "90"
-  # - "135"
-  - "180"
-  # - "225"
-  - "270"
-  # - "315"

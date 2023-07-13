@@ -5,42 +5,29 @@ from PIL import Image
 import random
 import numpy as np
 import cv2
-import albumentations as A
-
-
-def expanded_image(image: np.ndarray, background_image: np.ndarray, x_expand_rate: float = 0.1, y_expand_rate: float = 0.1) -> Image:
-
-    # Convert the images to numpy arrays
-    # image_array = np.array(image)
-
-    # Get the image width and height
-    h, w, c = image.shape
-
-    # Calculate the expansion range
-    x_expand_range = int(0 * w), int(x_expand_rate * w)
-    y_expand_range = int(0 * h), int(y_expand_rate * h)
-
-    # Generate random expansion values for top, left, bottom, and right
-    expand_top = random.randint(*y_expand_range)
-    expand_bottom = random.randint(*y_expand_range)
-    expand_left = random.randint(*x_expand_range)
-    expand_right = random.randint(*x_expand_range)
-    
-
-    background_image = cv2.resize(background_image, (w+expand_left+expand_right, h+expand_top+expand_bottom))
-
-    # Expand the image with the background image
-    expanded_image = np.copy(background_image)
-    expanded_image[expand_top:expand_top + h, expand_left:expand_left + w] = image
-
-    # Convert the expanded image back to PIL image
-    # expanded_image = Image.fromarray(expanded_image)
-
-    return expanded_image
-
+from model.augment import expanded_image, get_transform, rotate_img
 
 
 class CustomDataset(Dataset):
+    """
+    Custom dataset class for loading and augmenting image data.
+
+    Args:
+        json_file (str): The path to the JSON file containing the dataset information.
+        num_classes (int): The number of classes in the dataset. Default is 4.
+        background_dir (str): The directory containing background images for augmentation. Default is None.
+        transform (Callable): A callable function to apply transformations to the images. Default is None.
+
+    Attributes:
+        transform (Callable): A callable function to apply transformations to the images.
+        classes (List[str]): The list of class labels.
+        samples (List[Dict]): The list of sample data containing image paths and labels.
+        data_dir (str): The directory containing the dataset files.
+        num_classes (int): The number of classes in the dataset.
+        augment (albumentations.Compose): The composition of image augmentations.
+        bg_list (List[np.ndarray]): The list of background images for augmentation.
+
+    """
     def __init__(self, json_file: str, 
                        num_classes: int = 4, 
                        background_dir: str = None, 
@@ -56,12 +43,7 @@ class CustomDataset(Dataset):
 
         self.data_dir = os.path.dirname(json_file)
         self.num_classes = num_classes
-        self.augment =A.Compose([
-                                A.RandomBrightnessContrast(p=0.5),
-                                A.GaussNoise(p=0.5),
-                                A.Blur(p=0.5),
-                                A.PixelDropout(dropout_prob = random.uniform(0.1, 0.5), p = 0.5),
-                            ])
+        self.augment = get_transform(prob = 0.5)
         if background_dir is None:
             self.bg_list = None
         else:
@@ -71,6 +53,16 @@ class CustomDataset(Dataset):
         return len(self.samples)
     
     def __getitem__(self, index):
+        """
+        Get an item from the dataset at the specified index and augment with rotate, expand and some transforms from albumentations
+
+        Args:
+            index (int): The index of the item to retrieve.
+
+        Returns:
+            Tuple[Image.Image, int]: The augmented image and its corresponding label.
+
+        """
         sample = self.samples[index]
         image_path = os.path.join(self.data_dir, sample['image_path']) 
         label = int(sample['label'])
@@ -78,16 +70,24 @@ class CustomDataset(Dataset):
         label = random.randint(0, self.num_classes-1)
 
         # Load the image
-        image = Image.open(image_path).convert('RGB')
-        image = image.rotate(int(360*label/self.num_classes), expand=True)
+        image = Image.open(image_path)
+        image = image.convert('RGBA')
 
-        #augment
-        image_array = np.array(image)
+        #Rotate augment
+        if random.uniform(0, 1) < 0.5:
+            image = rotate_img(image, random.randint(-10, 10)) 
+
+        #Rotate label
+        image = rotate_img(image, int(360*label/self.num_classes)) 
+
+        #Expand with background
         if self.bg_list is not None:
             if random.uniform(0, 1) < 0.5:
-                image_array = expanded_image(image_array, random.choice(self.bg_list), x_expand_rate = 0.05, y_expand_rate = 0.1)
+                image = expanded_image(image, random.choice(self.bg_list), x_expand_rate = 0.1, y_expand_rate = 0.2)
 
-    
+        image = image.convert('RGB')
+        image_array = np.array(image)
+
         # Apply the augmentation transform to the image
         augmented = self.augment(image=image_array)
 

@@ -14,7 +14,7 @@ with open(yaml_path, 'r') as file:
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 model = load_model(model_name = config_gen['model_name'],
-                   num_classes =  len(config_gen['classes']),
+                   num_classes =  config_gen['num_classes'],
                    w = config_gen['fixed_w'], 
                    h = config_gen['fixed_h'])
 
@@ -41,7 +41,7 @@ image_folder = config_gen['image_folder']
 #         _, predicted = torch.max(outputs, 1)
         
 #     # Get the predicted label
-#     predicted_label = config_gen["classes"][predicted.item()]
+#     predicted_label = 360*predicted.item()/config_gen["num_classes"]
 
 #     print(f"{filename}")
 #     print(f'Predicted label: {predicted_label}')
@@ -69,7 +69,7 @@ for i in range(test_num):
         _, predicted = torch.max(outputs, 1)
         
     # Get the predicted label
-    predicted_label = config_gen["classes"][predicted.item()]
+    predicted_label = 360*predicted.item()/config_gen["num_classes"]
 
     # print(f"{filename}")
     print(f"Groundtruth: {label*90}")
