@@ -25,7 +25,9 @@ To increase the dataset, several methods are used:
 - Rotate: Rotate the image by a small angle (10 degrees), only applicable for tasks involving large angle rotation.
 - Expand: Expand the image by a certain margin and parse it on a background image
 - Some augmentation functions from the Albumentations library.
-<img src="example/augment_1.png" alt="Example" width="400">
+- 
+<img src="example/augment_1.png" alt="Example" width="200">
+
 ## Installation
 Install the required dependencies. It is recommended to set up a virtual environment:
 ```shell
