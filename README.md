@@ -65,7 +65,7 @@ Install the required dependencies. It is recommended to set up a virtual environ
 ```
 
 
-4. Test the model: image folder and weight path in train_config.yml. [weight](https://drive.google.com/drive/folders/1Vq7OzlVwTjkxw2t_dycA1Trga3kqDH7f?usp=drive_link)
+4. Test the model: image folder and weight path in train_config.yml. 
 ```shell
     python inference.py
 ```
