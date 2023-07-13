@@ -2,22 +2,12 @@
 
 This model is used to check the degree of rotation in an image, typically checking for rotations of 90, 180, or 270 degrees.
 
-## To-Do List
-
-- [x] Train, inference code
-- [x] Create Onnx 
-- [x] Multi rotation
-- [x] Image augment
-
 ## Multi rotation
 This project focuses on rotating images in a dataset based on the number of classes. The rotation is performed in a range of 360 degrees: `classes[i] = int(360*i/num_classes)`.
 
 Example:
-
 - `num_classes = 2` results in `classes = ["0", "180"]`, meaning the images will be rotated either "0" or "180" degrees.
-
 - `num_classes = 4` results in `classes = ["0", "90", "180", "270"]`.
-
 - `num_classes = 8` results in `classes = ["0", "45", "90", "135", "180", "225", "270", "315"]`.
 
 
