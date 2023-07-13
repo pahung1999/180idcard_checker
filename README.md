@@ -26,7 +26,7 @@ To increase the dataset, several methods are used:
 - Expand: Expand the image by a certain margin and parse it on a background image
 - Some augmentation functions from the Albumentations library.
 - 
-<img src="example/augment_1.png" alt="Example" width="200">
+<img src="example/augment_1.png" alt="Example" width="200"> <img src="example/augment_2.png" alt="Example" width="200"> <img src="example/augment_3.png" alt="Example" width="200"> <img src="example/augment_4.png" alt="Example" width="200">
 
 ## Installation
 Install the required dependencies. It is recommended to set up a virtual environment:
