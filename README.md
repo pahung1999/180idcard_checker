@@ -38,7 +38,7 @@ Install the required dependencies. It is recommended to set up a virtual environ
 1. Prepare the training data:
     - Place ID card images in the ./images folder.
     - Create a JSON file (data.json) in the following format:
-    - Note: Since the model will automatically rotate the images based on the number of classes, the images in the dataset should be unrotated, meaning that the label for all the images should be "0". Example data: [id_card_not_rotate.zip](https://drive.google.com/file/d/1suO5nXOefQW1k5nF-Js1dOFndzmsis-J/view?usp=drive_link)
+    - Note: Since the model will automatically rotate the images based on the number of classes, the images in the dataset should be unrotated, meaning that the label for all the images should be "0". 
 
     ```json
     {
